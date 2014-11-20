@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" version="2.1">
+    <persistence-unit name="api_scraper" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>database.entity.Project</class>
+        <class>database.entity.Tag</class>
+        <class>database.entity.License</class>
+        <class>database.entity.Link</class>
+        <class>database.entity.Category</class>
+        <class>database.entity.Page</class>
+
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/openhub"/>
+            <property name="javax.persistence.jdbc.user" value="openhub"/>
+            <property name="javax.persistence.jdbc.password" value="openhub"/>
+
+            <!--
+            <property name="eclipselink.profiler" value="PerformanceProfiler"/>
+            -->
+
+            <!-- EclipseLink should create the database schema automatically -->
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+
+            <!-- Server and logging settings -->
+            <property name="eclipselink.logging.level" value="INFO"/>
+        </properties>
+    </persistence-unit>
+</persistence>
