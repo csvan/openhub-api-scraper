@@ -3,50 +3,33 @@ package miner
 import java.util.logging
 
 import akka.actor.{Actor, Props}
-
-import scala.xml.NodeSeq
+import miner.organisation.MineOrganisations
+import miner.project._
 
 /**
  * Created by christopher on 19/11/14.
  */
 class SequentialSupervisor(keys: List[String]) extends Actor {
 
-  val pagesToProcess = 950
-  var increment = 1
-  var currentKey = 0
+  val keyLoop = new RotatingList[String](keys)
 
-  var worker = context.actorOf(Props[Worker], name = "worker")
+  var worker = context.actorOf(Props[ProjectWorker], name = "worker")
 
   def receive = {
 
-    case DoneMining =>
+    case DoneMiningProjects(last) =>
       logging.Logger.getAnonymousLogger.info(s"[Supervisor] has received DoneMining message")
-
-      increment += 950
-
-      // Loop the keys if necessary
-      if (currentKey >= keys.length - 1) {
-        currentKey = 0
-      }
-      else {
-        currentKey += 1
-      }
-
-      worker ! MinePages(keys(currentKey), increment, pagesToProcess)
+      worker ! MineProjects(keyLoop.next(), last+1, 20)
 
     case StartMining =>
       logging.Logger.getAnonymousLogger.info(s"[Supervisor] has received StartMining message")
-      worker ! MinePages(keys(currentKey), increment, pagesToProcess)
+      worker ! MineProjects(keyLoop.next(), 1, 10)
 
     case ExtractedProject(xml) =>
-      ProjectXmlProcessor.extractedProject(xml)
+      ProjectXmlProcessor.extractProject(xml)
   }
 }
 
 case class StartMining()
 
 case class DoneMining()
-
-case class MinePages(key: String, start: Int, elements: Int)
-
-case class ExtractedProject(projectXML: NodeSeq)

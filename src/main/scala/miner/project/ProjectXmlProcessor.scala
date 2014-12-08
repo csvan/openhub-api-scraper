@@ -1,4 +1,4 @@
-package miner
+package miner.project
 
 import java.text.SimpleDateFormat
 import java.util.logging
@@ -13,7 +13,7 @@ import scala.xml._
  */
 object ProjectXmlProcessor {
 
-  def extractedProject(projectXML: NodeSeq) = {
+  def extractProject(projectXML: NodeSeq) = {
 
     try {
 
@@ -103,6 +103,16 @@ object ProjectXmlProcessor {
           project.setAverageRating(-1)
       }
 
+      // Set the dates
+      val formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+      val created = formatter.parse((projectXML \ "created_at").text)
+      val modified = formatter.parse((projectXML \ "updated_at").text)
+
+      project.setCreatedAt(created)
+      project.setUpdatedAt(modified)
+
+      ProjectManager.persist(project)
+
       // Always try to find existing fields first
       (projectXML \\ "tag").foreach((node: Node) => {
         val tagTitle = node.text
@@ -158,15 +168,7 @@ object ProjectXmlProcessor {
         }
       })
 
-      // Set the dates
-      val formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-      val created = formatter.parse((projectXML \ "created_at").text)
-      val modified = formatter.parse((projectXML \ "updated_at").text)
-
-      project.setCreatedAt(created)
-      project.setUpdatedAt(modified)
-
-      ProjectManager.persist(project)
+      ProjectManager.update(project)
 
       logging.Logger.getAnonymousLogger.fine(s"[Supervisor] succesfully added Project with id ${project.getId}")
       //logging.Logger.getAnonymousLogger.fine(s"[Supervisor] Total projects processed: ${success += 1}")

@@ -10,7 +10,18 @@ import java.util.List;
  * Created by csvanefalk on 18/11/14.
  */
 @Entity
-public class Project extends AbstractEntity {
+public class Project implements IEntity {
+
+    @Id
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     private String name;
 
@@ -44,6 +55,8 @@ public class Project extends AbstractEntity {
     private int analysisID;
 
     private float averageRating;
+
+    private boolean isManuallyInserted;
 
     @ManyToMany(cascade = {CascadeType.REFRESH})
     List<Tag> tags = new LinkedList<>();
@@ -201,5 +214,13 @@ public class Project extends AbstractEntity {
 
     public void addTag(Tag tag) {
         this.tags.add(tag);
+    }
+
+    public boolean isManuallyInserted() {
+        return isManuallyInserted;
+    }
+
+    public void setManuallyInserted(boolean isManuallyInserted) {
+        this.isManuallyInserted = isManuallyInserted;
     }
 }
